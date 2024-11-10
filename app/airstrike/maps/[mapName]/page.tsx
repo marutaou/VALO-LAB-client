@@ -25,7 +25,6 @@ import {
 
 import apiClient from "@/lib/apiClient";
 import { agentNameConversion } from "@/public/data/agentNameConversion";
-import { ListRestart } from "lucide-react";
 
 interface ListData {
 	id: number;
@@ -49,7 +48,7 @@ interface ListData {
 	favorite: number;
 }
 
-const maps = ({ params }: { params: { mapName: string } }) => {
+function maps({ params }: { params: { mapName: string } }) {
 	const [listData, setListData] = useState<ListData[]>([]);
 	const [selrctTableRow, setSelectTableRow] = useState<number | null>(null);
 	const [selectRowArray, setSelectRowArray] = useState<ListData | undefined>(
@@ -224,6 +223,6 @@ const maps = ({ params }: { params: { mapName: string } }) => {
 			</aside>
 		</div>
 	);
-};
+}
 
 export default maps;
