@@ -48,7 +48,7 @@ interface ListData {
 	favorite: number;
 }
 
-function maps({ params }: { params: { mapName: string } }) {
+function Maps({ params }: { params: { mapName: string } }) {
 	const [listData, setListData] = useState<ListData[]>([]);
 	const [selrctTableRow, setSelectTableRow] = useState<number | null>(null);
 	const [selectRowArray, setSelectRowArray] = useState<ListData | undefined>(
@@ -225,4 +225,4 @@ function maps({ params }: { params: { mapName: string } }) {
 	);
 }
 
-export default maps;
+export default Maps;

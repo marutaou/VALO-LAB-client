@@ -1,7 +1,7 @@
 import React from "react";
 import MapmenuWindow from "../../components/mapmenuWindow";
 
-const Airstrike = () => {
+function Airstrike() {
 	const mapsArray = [
 		{ id: 1, mapName: "ascent" },
 		{ id: 2, mapName: "split" },
@@ -29,6 +29,6 @@ const Airstrike = () => {
 			</div>
 		</div>
 	);
-};
+}
 
 export default Airstrike;

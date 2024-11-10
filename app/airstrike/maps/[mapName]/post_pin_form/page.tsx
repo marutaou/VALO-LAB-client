@@ -57,7 +57,7 @@ interface FormValue {
 	};
 }
 
-function postPinForm({ params }: { params: { mapName: string } }) {
+function PostPinForm({ params }: { params: { mapName: string } }) {
 	const [agentImageSelect, setAgentImageSelect] = useState<number | null>(null);
 	const [placeNames, setPlaceNames] = useState<
 		{ id: number; placeName: string }[]
@@ -737,4 +737,4 @@ function postPinForm({ params }: { params: { mapName: string } }) {
 	);
 }
 
-export default postPinForm;
+export default PostPinForm;
