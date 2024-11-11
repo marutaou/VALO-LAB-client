@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "AirstrikePost" ALTER COLUMN "charege" SET DATA TYPE TEXT,
+ALTER COLUMN "bounce" SET DATA TYPE TEXT;

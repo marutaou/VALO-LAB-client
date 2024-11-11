@@ -1,0 +1,51 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model AirstrikePost {
+  id Int @id @default(autoincrement())
+  authorId String
+  map String
+  agent String
+  title String
+  comment String
+  placename String
+  posture String
+  charge String?
+  bounce String?
+  throwing String?
+  standingPositionImage String
+  landmarkImage String
+  firingPinX Float?
+  firingPinY Float?
+  fallingPinX Float?
+  fallingPinY Float?
+  favorite Int @default(0)
+  createdAt DateTime @default(now())
+  author User @relation(fields: [authorId], references: [userId])
+  favManager AirstrikeFavoriteManager[]
+}
+
+model User {
+  userId String @unique
+  username String
+  password String
+  posrts AirstrikePost[]
+  airstrikeFavmanager AirstrikeFavoriteManager[]
+}
+
+model AirstrikeFavoriteManager {
+  id Int @id @default(autoincrement())
+  userId String
+  postId Int
+  user User @relation(fields: [userId], references: [userId])
+  post AirstrikePost @relation(fields: [postId], references: [id])
+}
