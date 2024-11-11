@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, FieldErrors } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { ref, getDownloadURL } from "firebase/storage";
 import { storage } from "@/firebaseConfig";
 import apiClient from "@/lib/apiClient";
 
@@ -195,11 +195,6 @@ function PostPinForm({ params }: { params: { mapName: string } }) {
 				`uploads/${value.landmarkImage[0].name}`
 			);
 
-			const [file1Snapshot, file2Snapshot] = await Promise.all([
-				uploadBytes(standingRef, value.standingPositionImage[0]),
-				uploadBytes(landmarkRef, value.landmarkImage[0]),
-			]);
-
 			const [standingUrl, landmarkUrl] = await Promise.all([
 				getDownloadURL(standingRef),
 				getDownloadURL(landmarkRef),
@@ -225,7 +220,7 @@ function PostPinForm({ params }: { params: { mapName: string } }) {
 		}
 	};
 
-	const onError = (errors: any) => {
+	const onError = (errors: FieldErrors) => {
 		if (errors) {
 			window.alert("入力内容に不備があります。"); // アラートを表示
 		}
