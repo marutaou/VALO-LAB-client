@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { ref, getDownloadURL } from "firebase/storage";
 import { storage } from "@/firebaseConfig";
 import apiClient from "@/lib/apiClient";
+import Image from "next/image";
 
 import { mapNameConversion } from "@/public/data/mapNameConversion";
 import AgentImage from "@/components/agentImage";
@@ -40,20 +41,6 @@ interface Place {
 interface MapData {
 	maps: {
 		[key: string]: Place[];
-	};
-}
-
-interface FormValue {
-	value: {
-		title: string;
-		comment: string;
-		placeName: string;
-		posture: string;
-		standingPositionImage: FileList;
-		landmarkImage: FileList;
-		charge?: string | undefined;
-		bounce?: string | undefined;
-		throwing?: string | undefined;
 	};
 }
 
@@ -597,9 +584,11 @@ function PostPinForm({ params }: { params: { mapName: string } }) {
 											)}
 										/>
 										{image1Preview && (
-											<img
+											<Image
 												src={image1Preview}
-												alt="Preview"
+												alt="Previe"
+												width={500}
+												height={300}
 												className="mt-2 w-full"
 											/>
 										)}
@@ -652,10 +641,12 @@ function PostPinForm({ params }: { params: { mapName: string } }) {
 											)}
 										/>
 										{image2Preview && (
-											<img
+											<Image
 												src={image2Preview}
 												alt="Preview"
-												className="mt-2 w-80"
+												width={500}
+												height={300}
+												className="mt-2 w-full"
 											/>
 										)}
 									</CardContent>

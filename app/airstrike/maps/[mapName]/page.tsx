@@ -69,7 +69,7 @@ function Maps({ params }: { params: { mapName: string } }) {
 		};
 
 		fetchData();
-	}, []);
+	}, [params.mapName]);
 
 	//クリックしたリストを選択済みにする。
 	const handleTableRowClick = (rowId: number) => {
