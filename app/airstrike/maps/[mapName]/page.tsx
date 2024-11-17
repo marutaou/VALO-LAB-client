@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import AgentSelectImage from "@/components/AgentSelectImage";
+import { agentArray } from "./post_pin_form/parameter";
 
 import Image from "next/image";
 import { Button } from "@/components/ui/button-main";
@@ -25,6 +27,7 @@ import {
 
 import apiClient from "@/lib/apiClient";
 import { agentNameConversion } from "@/public/data/agentNameConversion";
+import FavoriteButton from "@/components/FavoriteButton";
 
 interface ListData {
 	id: number;
@@ -126,6 +129,15 @@ function Maps({ params }: { params: { mapName: string } }) {
 							<span className="text-lg p-4">空爆ポイントを投稿する</span>
 						</Link>
 					</Button>
+					<div className="flex gap-4 mt-2 ml-10">
+						{agentArray.map((agent) => (
+							<AgentSelectImage
+								imageWidth={80}
+								imageHeight={80}
+								agentName={agent.AgentName}
+							/>
+						))}
+					</div>
 				</div>
 				<div className="ml-10">
 					<Table>
@@ -136,7 +148,7 @@ function Maps({ params }: { params: { mapName: string } }) {
 								<TableHead>エージェント名</TableHead>
 								<TableHead>投稿者</TableHead>
 								<TableHead>詳細</TableHead>
-								<TableHead className="text-right">いいね数</TableHead>
+								<TableHead className="text-right">お気に入り</TableHead>
 							</TableRow>
 						</TableHeader>
 						<TableBody>
@@ -214,7 +226,10 @@ function Maps({ params }: { params: { mapName: string } }) {
 											</DialogContent>
 										</Dialog>
 									</TableCell>
-									<TableCell className="text-right">{data.favorite}</TableCell>
+									<TableCell className="text-right">
+										<FavoriteButton />
+										{data.favorite}
+									</TableCell>
 								</TableRow>
 							))}
 						</TableBody>
