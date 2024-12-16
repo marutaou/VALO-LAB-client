@@ -28,6 +28,9 @@ import {
 import apiClient from "@/lib/apiClient";
 import { agentNameConversion } from "@/public/data/agentNameConversion";
 import FavoriteButton from "@/components/FavoriteButton";
+import { number } from "zod";
+import { addRequestMeta } from "next/dist/server/request-meta";
+import { ListenOptions } from "net";
 
 interface ListData {
 	id: number;
@@ -53,10 +56,12 @@ interface ListData {
 
 function Maps({ params }: { params: { mapName: string } }) {
 	const [listData, setListData] = useState<ListData[]>([]);
+	const [latestListData, setLatestListData] = useState<ListData[]>([]);
 	const [selrctTableRow, setSelectTableRow] = useState<number | null>(null);
 	const [selectRowArray, setSelectRowArray] = useState<ListData | undefined>(
 		undefined
 	);
+	const [agentImageSelect, setAgentImageSelect] = useState<number | null>(null);
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -65,6 +70,7 @@ function Maps({ params }: { params: { mapName: string } }) {
 					`/posts/AirstrikeListData/${params.mapName}`
 				);
 				setListData(response.data); // データを設定
+				setLatestListData(response.data); // データを設定
 				console.log(response.data);
 			} catch (error) {
 				console.error("Failed to fetch data:", error);
@@ -81,8 +87,18 @@ function Maps({ params }: { params: { mapName: string } }) {
 		setSelectRowArray(selectArray);
 	};
 
+	const handleAgentImageClick = (agentId: number) => {
+		setAgentImageSelect(agentId);
+		const agent = agentArray.find((agent) => agent.id === agentId);
+		console.log(listData);
+		const filterList = listData.filter(
+			(data) => data.agent === agent?.AgentName
+		);
+		setLatestListData(filterList);
+	};
+
 	return (
-		<div className="container justtify-center mx-auto pt-10 flex">
+		<div className="container justtify-center mx-auto pt-e flex">
 			<main className="w-5/12">
 				<h1 className="text-5xl mb-4 border-b-2 w-2/3">
 					MAP名:{mapNameConversion(params.mapName)}
@@ -131,110 +147,132 @@ function Maps({ params }: { params: { mapName: string } }) {
 					</Button>
 					<div className="flex gap-4 mt-2 ml-10">
 						{agentArray.map((agent) => (
-							<AgentSelectImage
-								imageWidth={80}
-								imageHeight={80}
-								agentName={agent.AgentName}
-							/>
+							<div
+								key={agent.id}
+								onClick={() => handleAgentImageClick(agent.id)}
+								style={{
+									border:
+										agentImageSelect === agent.id
+											? "2px solid rgb(239 68 68)"
+											: "2px solid white", // IDが一致する場合はボーダーを表示
+									opacity:
+										agentImageSelect !== null && agentImageSelect !== agent.id
+											? 0.4
+											: 1, // 一致しない場合は画像を暗く
+									borderRadius: 11,
+								}}
+							>
+								<AgentSelectImage agentName={agent.AgentName} />
+							</div>
 						))}
 					</div>
 				</div>
-				<div className="ml-10">
-					<Table>
-						<TableHeader>
-							<TableRow>
-								<TableHead>着地点名称</TableHead>
-								<TableHead>タイトル</TableHead>
-								<TableHead>エージェント名</TableHead>
-								<TableHead>投稿者</TableHead>
-								<TableHead>詳細</TableHead>
-								<TableHead className="text-right">お気に入り</TableHead>
-							</TableRow>
-						</TableHeader>
-						<TableBody>
-							{listData.map((data) => (
-								<TableRow
-									key={data.id}
-									onClick={() => handleTableRowClick(data.id)}
-									className={selrctTableRow === data.id ? "bg-red-500/50" : ""}
-								>
-									<TableCell className="font-medium">
-										{data.placename}
-									</TableCell>
-									<TableCell>{data.title}</TableCell>
-									<TableCell>{agentNameConversion(data.agent)}</TableCell>
-									<TableCell>{data.authorId}</TableCell>
-									<TableCell>
-										<Dialog>
-											<DialogTrigger>詳細を見る</DialogTrigger>
-											<DialogContent className="flex">
-												<DialogHeader className="w-1/2">
-													<DialogTitle className="text-4xl font-bold">
-														{data.title}
-													</DialogTitle>
-
-													<DialogDescription className="text-2xl">
-														着地点名称：{data.placename}
-													</DialogDescription>
-													<DialogDescription className="text-2xl">
-														発射時の体勢：{data.posture}
-													</DialogDescription>
-													{data.charge && (
-														<DialogDescription className="text-2xl">
-															チャージ数：{data.charge}
-														</DialogDescription>
-													)}
-													{data.bounce && (
-														<DialogDescription className="text-2xl">
-															バウンス数：{data.bounce}
-														</DialogDescription>
-													)}
-													{data.throwing && (
-														<DialogDescription className="text-2xl">
-															投げ方；{data.throwing}
-														</DialogDescription>
-													)}
-													<p className="text-2xl">コメント</p>
-													<DialogDescription className="text-1xl">
-														{data.comment}
-													</DialogDescription>
-												</DialogHeader>
-												<div className="mb-4">
-													<div>
-														<p className="text-2xl font-bold mb-2">
-															立ち位置画像
-														</p>
-														<Image
-															src={data.standingPositionImage}
-															width={1920}
-															height={1080}
-															alt={"立ち位置画像"}
-															className="w-[640px] h-[360px] rounded-sm mb-4"
-														/>
-													</div>
-													<div>
-														<p className="text-2xl font-bold mb-2">目印画像</p>
-														<Image
-															src={data.landmarkImage}
-															width={1920}
-															height={1080}
-															alt={"目印画像"}
-															className="w-[640px] h-[360px] rounded-sm"
-														/>
-													</div>
-												</div>
-											</DialogContent>
-										</Dialog>
-									</TableCell>
-									<TableCell className="text-right">
-										<FavoriteButton />
-										{data.favorite}
-									</TableCell>
+				{agentImageSelect ? (
+					<div className="ml-10">
+						<Table>
+							<TableHeader>
+								<TableRow>
+									<TableHead>着地点名称</TableHead>
+									<TableHead>タイトル</TableHead>
+									<TableHead>エージェント名</TableHead>
+									<TableHead>投稿者</TableHead>
+									<TableHead>詳細</TableHead>
+									<TableHead className="text-right">お気に入り</TableHead>
 								</TableRow>
-							))}
-						</TableBody>
-					</Table>
-				</div>
+							</TableHeader>
+							<TableBody>
+								{latestListData.map((data) => (
+									<TableRow
+										key={data.id}
+										onClick={() => handleTableRowClick(data.id)}
+										className={
+											selrctTableRow === data.id ? "bg-red-500/50" : ""
+										}
+									>
+										<TableCell className="font-medium">
+											{data.placename}
+										</TableCell>
+										<TableCell>{data.title}</TableCell>
+										<TableCell>{agentNameConversion(data.agent)}</TableCell>
+										<TableCell>{data.authorId}</TableCell>
+										<TableCell>
+											<Dialog>
+												<DialogTrigger>詳細を見る</DialogTrigger>
+												<DialogContent className="flex">
+													<DialogHeader className="w-1/2">
+														<DialogTitle className="text-4xl font-bold">
+															{data.title}
+														</DialogTitle>
+
+														<DialogDescription className="text-2xl">
+															着地点名称：{data.placename}
+														</DialogDescription>
+														<DialogDescription className="text-2xl">
+															発射時の体勢：{data.posture}
+														</DialogDescription>
+														{data.charge && (
+															<DialogDescription className="text-2xl">
+																チャージ数：{data.charge}
+															</DialogDescription>
+														)}
+														{data.bounce && (
+															<DialogDescription className="text-2xl">
+																バウンス数：{data.bounce}
+															</DialogDescription>
+														)}
+														{data.throwing && (
+															<DialogDescription className="text-2xl">
+																投げ方；{data.throwing}
+															</DialogDescription>
+														)}
+														<p className="text-2xl">コメント</p>
+														<DialogDescription className="text-1xl">
+															{data.comment}
+														</DialogDescription>
+													</DialogHeader>
+													<div className="mb-4">
+														<div>
+															<p className="text-2xl font-bold mb-2">
+																立ち位置画像
+															</p>
+															<Image
+																src={data.standingPositionImage}
+																width={1920}
+																height={1080}
+																alt={"立ち位置画像"}
+																className="w-[640px] h-[360px] rounded-sm mb-4"
+															/>
+														</div>
+														<div>
+															<p className="text-2xl font-bold mb-2">
+																目印画像
+															</p>
+															<Image
+																src={data.landmarkImage}
+																width={1920}
+																height={1080}
+																alt={"目印画像"}
+																className="w-[640px] h-[360px] rounded-sm"
+															/>
+														</div>
+													</div>
+												</DialogContent>
+											</Dialog>
+										</TableCell>
+										<TableCell className="text-right">
+											<FavoriteButton />
+											{data.favorite}
+										</TableCell>
+									</TableRow>
+								))}
+							</TableBody>
+						</Table>
+					</div>
+				) : (
+					<div className="ml-10 text-2xl font-bold">
+						エージェントを選択してください。
+					</div>
+				)}
 			</aside>
 		</div>
 	);

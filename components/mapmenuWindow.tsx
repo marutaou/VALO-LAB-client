@@ -10,7 +10,7 @@ interface ContantName {
 const mapmenuWindow = (props: ContantName) => {
 	return (
 		<Link href={`/${props.category}/maps/${props.contentName}`}>
-			<div className="w-96 h-60 overflow-hidden rounded-2xl">
+			<div className="w-80 h-52 overflow-hidden rounded-2xl">
 				<Image
 					src={`/images/maps/${props.contentName}.png`}
 					width={500}

@@ -18,7 +18,7 @@ function Airstrike() {
 	return (
 		<div className="container justtify-center mx-auto pt-10">
 			<h1 className="text-2xl font-bold">MAPを選択してください。</h1>
-			<div className="grid grid-cols-4 gap-1">
+			<div className="grid grid-cols-4 gap-8">
 				{mapsArray.map((map) => (
 					<MapmenuWindow
 						key={map.id}
