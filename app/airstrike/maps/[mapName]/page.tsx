@@ -28,9 +28,6 @@ import {
 import apiClient from "@/lib/apiClient";
 import { agentNameConversion } from "@/public/data/agentNameConversion";
 import FavoriteButton from "@/components/FavoriteButton";
-import { number } from "zod";
-import { addRequestMeta } from "next/dist/server/request-meta";
-import { ListenOptions } from "net";
 
 interface ListData {
 	id: number;

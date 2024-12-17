@@ -5,10 +5,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
 
 export default function FavoriteButton() {
-	const [favorite, setFavorite] = useState<Boolean>(false);
+	const [favorite, setFavorite] = useState(false);
 
 	const handleClick = () => {
-		favorite ? setFavorite(false) : setFavorite(true);
+		setFavorite((prev) => !prev);
 	};
 
 	return (
