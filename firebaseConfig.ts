@@ -1,4 +1,4 @@
-import { initializeApp } from "firebase/app";
+import { initializeApp, getApps } from "firebase/app";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
@@ -12,9 +12,11 @@ const firebaseConfig = {
 };
 
 // Firebaseアプリの初期化
-const app = initializeApp(firebaseConfig);
+const firebaseApp = !getApps().length
+	? initializeApp(firebaseConfig)
+	: getApps()[0];
 
 // Firebase Storageの取得
-const storage = getStorage(app);
+const storage = getStorage(firebaseApp);
 
 export { storage };

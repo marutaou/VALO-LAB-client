@@ -9,6 +9,14 @@ const config: Config = {
 	],
 	theme: {
 		extend: {
+			animate: {
+				duration: {
+					// デフォルトのdurationを上書き
+					"data-[state=open]:animate-in": "enter 50ms",
+					"dialog-overlay": "50ms", // ms単位で指定
+					"dialog-content": "50ms",
+				},
+			},
 			colors: {
 				background: "hsl(var(--background))",
 				foreground: "hsl(var(--foreground))",

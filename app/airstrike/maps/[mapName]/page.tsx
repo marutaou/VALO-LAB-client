@@ -226,6 +226,44 @@ function Maps({ params }: { params: { mapName: string } }) {
 															<DialogDescription className="text-1xl">
 																{data.comment}
 															</DialogDescription>
+															<p className="text-2xl">発射位置</p>
+															<DialogDescription className="text-1xl">
+																<div
+																	className="relative w-[450px] h-[450px] bg-cover bg-center border-4 border-gray-450 mt-4"
+																	style={{
+																		backgroundImage: `url(/images/maps/${params.mapName}-map.png)`,
+																	}}
+																>
+																	{selectRowArray && (
+																		<div
+																			key="standingPoint"
+																			className="absolute w-4 h-4 bg-red-500 rounded-full opacity-80"
+																			style={{
+																				left: `${
+																					selectRowArray.firingPinX * 450 - 12
+																				}px`,
+																				top: `${
+																					selectRowArray.firingPinY * 450 - 12
+																				}px`,
+																			}}
+																		/>
+																	)}
+																	{selectRowArray && (
+																		<div
+																			key="landingPoint"
+																			className="absolute w-8 h-8 bg-white rounded-full opacity-60"
+																			style={{
+																				left: `${
+																					selectRowArray.fallingPinX * 450 - 20
+																				}px`,
+																				top: `${
+																					selectRowArray.fallingPinY * 450 - 20
+																				}px`,
+																			}}
+																		/>
+																	)}
+																</div>
+															</DialogDescription>
 														</DialogHeader>
 														<div className="mb-4">
 															<div>
@@ -256,9 +294,9 @@ function Maps({ params }: { params: { mapName: string } }) {
 													</DialogContent>
 												</Dialog>
 											</TableCell>
-											<TableCell className="text-right">
+											<TableCell className="flex justify-end gap-1">
 												<FavoriteButton />
-												{data.favorite}
+												<p>{data.favorite}</p>
 											</TableCell>
 										</TableRow>
 									))}

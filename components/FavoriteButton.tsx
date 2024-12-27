@@ -16,12 +16,12 @@ export default function FavoriteButton() {
 			{favorite ? (
 				<FontAwesomeIcon
 					icon={faStar}
-					className="text-xl text-yellow-300 transform hover:scale-125 duration-300"
+					className="text-lg text-yellow-400 transform hover:scale-125 duration-300"
 				/>
 			) : (
 				<FontAwesomeIcon
 					icon={faStar}
-					className="text-xl transform hover:scale-125 duration-300"
+					className="text-lg transform hover:scale-125 duration-300"
 				/>
 			)}
 		</button>

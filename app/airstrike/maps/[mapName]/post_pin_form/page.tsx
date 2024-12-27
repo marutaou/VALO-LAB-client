@@ -5,7 +5,7 @@ import { useForm, FieldErrors } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { ref, getDownloadURL } from "firebase/storage";
+import { ref, getDownloadURL, uploadBytes } from "firebase/storage";
 import { storage } from "@/firebaseConfig";
 import apiClient from "@/lib/apiClient";
 import Image from "next/image";
@@ -172,7 +172,7 @@ function PostPinForm({ params }: { params: { mapName: string } }) {
 
 	const onSubmit = async (value: z.infer<typeof formSchema>) => {
 		try {
-			//画像データをFireBaseに保存する
+			// 画像をアップロードしてからURLを取得する
 			const standingRef = ref(
 				storage,
 				`uploads/${value.standingPositionImage[0].name}`
@@ -182,6 +182,13 @@ function PostPinForm({ params }: { params: { mapName: string } }) {
 				`uploads/${value.landmarkImage[0].name}`
 			);
 
+			// 画像のアップロード
+			await Promise.all([
+				uploadBytes(standingRef, value.standingPositionImage[0]),
+				uploadBytes(landmarkRef, value.landmarkImage[0]),
+			]);
+
+			// アップロード後にURLを取得
 			const [standingUrl, landmarkUrl] = await Promise.all([
 				getDownloadURL(standingRef),
 				getDownloadURL(landmarkRef),
