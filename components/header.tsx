@@ -12,13 +12,15 @@ import {
 	HoverCardTrigger,
 } from "@/components/ui/hover-card";
 
-const header = () => {
+const Header = () => {
 	const { data: session } = useSession();
-
 	return (
-		<div className="block w-screen h-16 bg-red-500 fixed z-10">
-			<div className="mx-auto flex container items-center justify-between">
-				<Link href={"/"} className="text-6xl font-bold text-white font-mono">
+		<div className="block w-full h-16 bg-red-500 fixed z-10">
+			<div className="mx-auto flex container items-center justify-between  px-8 pt-2 sm:pt-1 md-pt-0 sm:px-0">
+				<Link
+					href={"/"}
+					className="text-4xl sm:text-5xl xl:text-6xl font-bold text-white font-mono"
+				>
 					VALO-LAB
 				</Link>
 				<div className="flex gap-4">
@@ -28,11 +30,6 @@ const header = () => {
 						</>
 					) : (
 						<>
-							<div className="flex items-center">
-								<p className="font-bold text-xl text-white">
-									{session?.user?.name}
-								</p>
-							</div>
 							{session?.user?.image && session?.user?.name ? (
 								<>
 									<HoverCard>
@@ -72,4 +69,4 @@ const header = () => {
 	);
 };
 
-export default header;
+export default Header;

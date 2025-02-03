@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import AgentSelectImage from "@/components/AgentSelectImage";
-import { agentArray } from "./post_pin_form/parameter";
+import { agentArray } from "../post_pin_form/parameter";
 import Image from "next/image";
 import { Button } from "@/components/ui/button-main";
 import Link from "next/link";
@@ -38,6 +38,12 @@ import FavoriteButton from "@/components/FavoriteButton";
 import { useSession } from "next-auth/react";
 
 interface ListData {
+	post: ListProps;
+	postId: number;
+	usetId: number;
+}
+
+interface ListProps {
 	id: number;
 	agent: string;
 	authorId: string;
@@ -76,22 +82,28 @@ function Maps({ params }: { params: { mapName: string } }) {
 
 	useEffect(() => {
 		const fetchData = async () => {
+			// console.log(1);
+			if (!session?.user?.id) return;
+			// console.log(2);
+
 			try {
+				// console.log(3);
 				const response = await apiClient.get(
-					`/posts/AirstrikeListData/${params.mapName}`
+					`/posts/favorited_post/${session.user.id}`
 				);
+				// console.log(response.data);
 				setListData(response.data);
 				setLatestListData(response.data);
 			} catch (error) {
 				console.error("Failed to fetch data:", error);
 			}
 		};
-		fetchData();
-	}, [params.mapName]);
 
+		fetchData();
+	}, [session?.user?.id, params.mapName]);
 	const handleTableRowClick = (rowId: number) => {
 		setSelectTableRow(rowId);
-		const selectArray = listData.find((list) => list.id === rowId);
+		const selectArray = listData.find((list) => list.post.id === rowId);
 		setSelectRowArray(selectArray);
 	};
 
@@ -99,8 +111,9 @@ function Maps({ params }: { params: { mapName: string } }) {
 		setAgentImageSelect(agentId);
 		const agent = agentArray.find((agent) => agent.id === agentId);
 		const filterList = listData.filter(
-			(data) => data.agent === agent?.AgentName
+			(data) => data.post.agent === agent?.AgentName
 		);
+		console.log(filterList);
 		setLatestListData(filterList);
 	};
 
@@ -133,16 +146,16 @@ function Maps({ params }: { params: { mapName: string } }) {
 								<div
 									className="absolute w-4 h-4 bg-red-500 rounded-full opacity-80"
 									style={{
-										left: `${selectRowArray.firingPinX * 100}%`,
-										top: `${selectRowArray.firingPinY * 100}%`,
+										left: `${selectRowArray.post.firingPinX * 100}%`,
+										top: `${selectRowArray.post.firingPinY * 100}%`,
 										transform: "translate(-50%, -50%)",
 									}}
 								/>
 								<div
 									className="absolute w-8 h-8 bg-white rounded-full opacity-60"
 									style={{
-										left: `${selectRowArray.fallingPinX * 100}%`,
-										top: `${selectRowArray.fallingPinY * 100}%`,
+										left: `${selectRowArray.post.fallingPinX * 100}%`,
+										top: `${selectRowArray.post.fallingPinY * 100}%`,
 										transform: "translate(-50%, -50%)",
 									}}
 								/>
@@ -159,9 +172,9 @@ function Maps({ params }: { params: { mapName: string } }) {
 							{session ? (
 								<>
 									<Button>
-										<Link href={`/airstrike/maps/${params.mapName}/favorited`}>
+										<Link href={`/airstrike/maps/${params.mapName}`}>
 											<span className="text-base md:text-lg p-2 md:p-4">
-												お気に入りのみ
+												すべて表示
 											</span>
 										</Link>
 									</Button>
@@ -247,23 +260,23 @@ function Maps({ params }: { params: { mapName: string } }) {
 									<TableBody>
 										{latestListData.map((data) => (
 											<TableRow
-												key={data.id}
-												onClick={() => handleTableRowClick(data.id)}
+												key={data.post.id}
+												onClick={() => handleTableRowClick(data.post.id)}
 												className={
-													selrctTableRow === data.id ? "bg-red-500/50" : ""
+													selrctTableRow === data.post.id ? "bg-red-500/50" : ""
 												}
 											>
 												<TableCell className="font-medium whitespace-nowrap">
-													{data.placename}
+													{data.post.placename}
 												</TableCell>
 												<TableCell className="whitespace-nowrap">
-													{data.title}
+													{data.post.title}
 												</TableCell>
 												<TableCell className="hidden md:table-cell">
-													{agentNameConversion(data.agent)}
+													{agentNameConversion(data.post.agent)}
 												</TableCell>
 												<TableCell className="hidden md:table-cell">
-													{data.author.username}
+													{data.post.author.username}
 												</TableCell>
 												<TableCell>
 													<Dialog>
@@ -272,28 +285,28 @@ function Maps({ params }: { params: { mapName: string } }) {
 															<div className="flex flex-col lg:flex-row gap-6">
 																<DialogHeader className="w-full lg:w-1/2">
 																	<DialogTitle className="text-2xl md:text-4xl font-bold mb-4">
-																		{data.title}
+																		{data.post.title}
 																	</DialogTitle>
 																	<div className="space-y-4">
 																		<DialogDescription className="text-xl md:text-2xl">
-																			着地点名称：{data.placename}
+																			着地点名称：{data.post.placename}
 																		</DialogDescription>
 																		<DialogDescription className="text-xl md:text-2xl">
-																			発射時の体勢：{data.posture}
+																			発射時の体勢：{data.post.posture}
 																		</DialogDescription>
-																		{data.charge && (
+																		{data.post.charge && (
 																			<DialogDescription className="text-xl md:text-2xl">
-																				チャージ数：{data.charge}
+																				チャージ数：{data.post.charge}
 																			</DialogDescription>
 																		)}
-																		{data.bounce && (
+																		{data.post.bounce && (
 																			<DialogDescription className="text-xl md:text-2xl">
-																				バウンス数：{data.bounce}
+																				バウンス数：{data.post.bounce}
 																			</DialogDescription>
 																		)}
-																		{data.throwing && (
+																		{data.post.throwing && (
 																			<DialogDescription className="text-xl md:text-2xl">
-																				投げ方：{data.throwing}
+																				投げ方：{data.post.throwing}
 																			</DialogDescription>
 																		)}
 																		<div>
@@ -301,7 +314,7 @@ function Maps({ params }: { params: { mapName: string } }) {
 																				コメント
 																			</p>
 																			<DialogDescription className="text-base md:text-lg">
-																				{data.comment}
+																				{data.post.comment}
 																			</DialogDescription>
 																		</div>
 																		<div>
@@ -320,12 +333,12 @@ function Maps({ params }: { params: { mapName: string } }) {
 																							className="absolute w-4 h-4 bg-red-500 rounded-full opacity-80"
 																							style={{
 																								left: `${
-																									selectRowArray.firingPinX *
-																									100
+																									selectRowArray.post
+																										.firingPinX * 100
 																								}%`,
 																								top: `${
-																									selectRowArray.firingPinY *
-																									100
+																									selectRowArray.post
+																										.firingPinY * 100
 																								}%`,
 																								transform:
 																									"translate(-50%, -50%)",
@@ -335,12 +348,12 @@ function Maps({ params }: { params: { mapName: string } }) {
 																							className="absolute w-8 h-8 bg-white rounded-full opacity-60"
 																							style={{
 																								left: `${
-																									selectRowArray.fallingPinX *
-																									100
+																									selectRowArray.post
+																										.fallingPinX * 100
 																								}%`,
 																								top: `${
-																									selectRowArray.fallingPinY *
-																									100
+																									selectRowArray.post
+																										.fallingPinY * 100
 																								}%`,
 																								transform:
 																									"translate(-50%, -50%)",
@@ -359,7 +372,7 @@ function Maps({ params }: { params: { mapName: string } }) {
 																		</p>
 																		<div className="relative aspect-video w-full">
 																			<Image
-																				src={data.standingPositionImage}
+																				src={data.post.standingPositionImage}
 																				fill
 																				alt="立ち位置画像"
 																				className="rounded-sm object-cover"
@@ -372,7 +385,7 @@ function Maps({ params }: { params: { mapName: string } }) {
 																		</p>
 																		<div className="relative aspect-video w-full">
 																			<Image
-																				src={data.landmarkImage}
+																				src={data.post.landmarkImage}
 																				fill
 																				alt="目印画像"
 																				className="rounded-sm object-cover"
@@ -386,8 +399,8 @@ function Maps({ params }: { params: { mapName: string } }) {
 												</TableCell>
 												<TableCell className="text-right">
 													<FavoriteButton
-														postId={data.id}
-														favorite={data.favorite}
+														postId={data.post.id}
+														favorite={data.post.favorite}
 													/>
 												</TableCell>
 											</TableRow>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useForm, FieldErrors } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -32,6 +32,7 @@ import {
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 
 import { agentArray, postureArray } from "./parameter";
+import { useSession } from "next-auth/react";
 
 interface Place {
 	id: number;
@@ -52,6 +53,13 @@ function PostPinForm({ params }: { params: { mapName: string } }) {
 	const [image1Preview, setImage1Preview] = useState<string | null>(null);
 	const [image2Preview, setImage2Preview] = useState<string | null>(null);
 	const [pins, setPins] = useState<{ x: number; y: number }[]>([]);
+
+	//親要素の幅を取得する。
+	const parentRef = useRef<HTMLDivElement>(null);
+
+	//NextAuthのsession情報を取得
+	const { data: session } = useSession();
+
 	const router = useRouter();
 
 	const formSchema = z.object({
@@ -149,16 +157,20 @@ function PostPinForm({ params }: { params: { mapName: string } }) {
 	}, [agentImageSelect, reset]);
 
 	const handleMapClick = (e: React.MouseEvent<HTMLDivElement>) => {
-		const rect = e.currentTarget.getBoundingClientRect();
-		const x = (e.clientX - rect.left) / 700;
-		const y = (e.clientY - rect.top) / 700;
+		if (parentRef.current?.offsetWidth) {
+			const rect = e.currentTarget.getBoundingClientRect();
+			const x = (e.clientX - rect.left) / parentRef.current?.offsetWidth;
+			const y = (e.clientY - rect.top) / parentRef.current?.offsetWidth;
 
-		setPins((prevPins) =>
-			prevPins.length < 2 ? [...prevPins, { x, y }] : prevPins
-		); // 2本までのピンに制限
+			console.log(`X: ${x}, Y:${y}, width:${parentRef.current?.offsetWidth}`);
 
-		// フォームにピンデータを設定
-		setValue("pins", [...pins, { x, y }]);
+			setPins((prevPins) =>
+				prevPins.length < 2 ? [...prevPins, { x, y }] : prevPins
+			); // 2本までのピンに制限
+
+			// フォームにピンデータを設定
+			setValue("pins", [...pins, { x, y }]);
+		}
 	};
 
 	// ピンのリセット
@@ -202,7 +214,7 @@ function PostPinForm({ params }: { params: { mapName: string } }) {
 				standingUrl,
 				landmarkUrl,
 				agent: agent?.AgentName,
-				userId: "marutaou",
+				userId: session?.user.id,
 				map: params.mapName,
 			});
 
@@ -241,11 +253,11 @@ function PostPinForm({ params }: { params: { mapName: string } }) {
 	}, [params.mapName]);
 
 	return (
-		<div className="container mx-auto pt-10">
+		<div className="mx-auto pt-10 w-11/12 sm:2/3 lg:container">
 			<div className="mb-4 text-2xl border-b-2 w-48">
 				マップ名:{mapNameConversion(params.mapName)}
 			</div>
-			<div className="flex justify-between mb-4">
+			<div className="flex flex-wrap justify-center gap-1 mb-4">
 				{agentArray.map((agent) => (
 					<div
 						key={agent.id}
@@ -269,7 +281,7 @@ function PostPinForm({ params }: { params: { mapName: string } }) {
 			{agentImageSelect ? (
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit, onError)}>
-						<div className="w-1/2 mx-auto">
+						<div className="w-11/12 lg:w-2/3 xl:w-11/2 mx-auto">
 							<div className="w-full">
 								<div className="mb-4">
 									<Card className="px-4">
@@ -680,10 +692,11 @@ function PostPinForm({ params }: { params: { mapName: string } }) {
 								</CardHeader>
 								<CardContent>
 									<div
-										className="relative w-[700px] h-[700px] bg-cover bg-center border-4 border-gray-400 mt-4 mx-auto"
+										className="relative w-full lg:w-5/6 aspect-square bg-cover bg-center border-4 border-gray-400 mt-4 mx-auto"
 										style={{
 											backgroundImage: `url(/images/maps/${params.mapName}-map.png)`,
 										}}
+										ref={parentRef}
 										onClick={handleMapClick}
 									>
 										{pins[0] && (
@@ -691,8 +704,14 @@ function PostPinForm({ params }: { params: { mapName: string } }) {
 												key="standingPoint"
 												className="absolute w-4 h-4 bg-red-500 rounded-full opacity-80"
 												style={{
-													left: `${pins[0].x * 700 - 12}px`,
-													top: `${pins[0].y * 700 - 12}px`,
+													left: `${
+														pins[0].x * (parentRef.current?.offsetWidth ?? 1) -
+														12
+													}px`,
+													top: `${
+														pins[0].y * (parentRef.current?.offsetWidth ?? 1) -
+														12
+													}px`,
 												}}
 											/>
 										)}
@@ -701,8 +720,14 @@ function PostPinForm({ params }: { params: { mapName: string } }) {
 												key="landingPoint"
 												className="absolute w-8 h-8 bg-white rounded-full opacity-60"
 												style={{
-													left: `${pins[1].x * 700 - 20}px`,
-													top: `${pins[1].y * 700 - 20}px`,
+													left: `${
+														pins[1].x * (parentRef.current?.offsetWidth ?? 1) -
+														20
+													}px`,
+													top: `${
+														pins[1].y * (parentRef.current?.offsetWidth ?? 1) -
+														20
+													}px`,
 												}}
 											/>
 										)}

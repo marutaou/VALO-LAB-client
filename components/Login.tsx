@@ -1,7 +1,7 @@
 "use client";
 import { useSession, signIn, signOut } from "next-auth/react";
 
-const Component = () => {
+const Login = () => {
 	const { data: session } = useSession();
 
 	if (session) {
@@ -20,4 +20,4 @@ const Component = () => {
 	);
 };
 
-export default Component;
+export default Login;
