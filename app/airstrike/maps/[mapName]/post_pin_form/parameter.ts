@@ -9,6 +9,7 @@ export const agentArray = [
 	{ id: 8, AgentName: "gekko" },
 	{ id: 9, AgentName: "fade" },
 	{ id: 10, AgentName: "raze" },
+	{ id: 11, AgentName: "tejo" },
 ];
 
 export const postureArray = [

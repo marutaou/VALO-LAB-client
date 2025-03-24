@@ -30,9 +30,12 @@ export const authOptions: NextAuthOptions = {
 						email: user.email,
 					});
 					const userId = response.data.userId;
-					console.log(userId);
 					//userにIDを追加
 					user.id = userId;
+
+					const username = response.data.username;
+					console.log(username);
+					user.username = username;
 
 					return true;
 				}
@@ -46,18 +49,39 @@ export const authOptions: NextAuthOptions = {
 		async jwt({ token, user }) {
 			if (user) {
 				token.userId = user.id;
+				token.name = user.username;
 			}
 			return token;
 		},
 		// セッションコールバックを追加
 		async session({ session, token }) {
-			return {
-				...session,
-				user: {
-					...session.user,
-					id: token.userId,
-				},
-			};
+			try {
+				// APIを使用して最新のユーザー情報を取得
+				const response = await apiClient.post("/auth/findUser", {
+					email: session.user.email,
+				});
+
+				// セッションに最新の情報を追加
+				return {
+					...session,
+					user: {
+						...session.user,
+						id: token.userId,
+						username: response.data.username, // 最新のユーザー名
+						// 他に必要なユーザー情報があればここに追加
+					},
+				};
+			} catch (error) {
+				console.error("Session callback error:", error);
+				// エラーが発生しても基本的なセッション情報は返す
+				return {
+					...session,
+					user: {
+						...session.user,
+						id: token.userId,
+					},
+				};
+			}
 		},
 	},
 	debug: true, // デバッグモードを有効化

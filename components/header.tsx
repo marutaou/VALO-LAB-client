@@ -34,13 +34,15 @@ const Header = () => {
 								<>
 									<HoverCard>
 										<HoverCardTrigger>
-											<Image
-												src={session.user.image}
-												alt={session.user.name}
-												width={100}
-												height={100}
-												className="rounded-full w-10 h-10" // 'rounded-ful' というtypoも修正
-											/>
+											<Link href={"/mypage"}>
+												<Image
+													src={session.user.image}
+													alt={session.user.name}
+													width={100}
+													height={100}
+													className="rounded-full w-10 h-10" // 'rounded-ful' というtypoも修正
+												/>
+											</Link>
 										</HoverCardTrigger>
 										<HoverCardContent>
 											<p className="text-lg">{session?.user?.name}</p>

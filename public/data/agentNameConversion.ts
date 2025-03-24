@@ -25,6 +25,7 @@ export const agentNameConversion = (agentNameEG: string) => {
 		omen: "オーメン",
 		harbor: "ハーバー",
 		clove: "クローヴ",
+    tejo:"テホ",
 	};
 
 	return agentName[agentNameEG as keyof typeof agentName] || agentNameEG;
